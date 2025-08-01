@@ -1,6 +1,14 @@
-import { PinataSDK } from "pinata";
+// src/config.ts
 
-export const pinata = new PinataSDK({
-  pinataJwt: `${process.env.PINATA_JWT}`,
-  pinataGateway: `${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL}`
-});
+import PinataClient from "@pinata/sdk";
+
+// It's crucial to check that your PINATA_JWT environment variable is set
+const pinataJwt = process.env.PINATA_JWT;
+
+if (!pinataJwt) {
+  throw new Error("PINATA_JWT environment variable not set.");
+}
+
+const pinata = new PinataClient({ pinataJWTKey: pinataJwt });
+
+export { pinata };
