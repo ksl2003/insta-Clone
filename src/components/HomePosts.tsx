@@ -23,6 +23,22 @@ export default async function HomePosts({
       createdAt: "desc",
     },
     take: 100,
+    // Use select to specify all fields and the count
+    select: {
+      id: true,
+      author: true,
+      image: true,
+      description: true,
+      createdAt: true,
+      updatedAt: true,
+      // Also select the counts for related models
+      _count: {
+        select: {
+          likes: true,
+          comments: true,
+        },
+      },
+    },
   });
   const likes = await prisma.like.findMany({
     where: {
