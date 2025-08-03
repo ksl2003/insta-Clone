@@ -1,31 +1,29 @@
-'use client';
-import {updateProfile} from "@/actions";
-import {Profile} from "@prisma/client";
-import {Button, Switch, TextArea, TextField} from "@radix-ui/themes";
-import {CloudUploadIcon, UserIcon, CameraIcon} from "lucide-react";
-import {useRouter} from "next/navigation";
-import {useEffect, useRef, useState} from "react";
+"use client";
+import { updateProfile } from "@/actions";
+import { Profile } from "@prisma/client";
+import { Button, Switch, TextArea, TextField } from "@radix-ui/themes";
+import { UserIcon, CameraIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
-export default function SettingsForm({
-  profile,
-}:{
-  profile:Profile|null;
-}) {
+export default function SettingsForm({ profile }: { profile: Profile | null }) {
   const router = useRouter();
   const fileInRef = useRef<HTMLInputElement>(null);
-  const [file, setFile] = useState<File|null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(profile?.avatar || null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
-  
+
   useEffect(() => {
     // Initialize dark mode state
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const theme = savedTheme || (prefersDark ? 'dark' : 'light');
-    setIsDarkMode(theme === 'dark');
+    const savedTheme = localStorage.getItem("theme");
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    const theme = savedTheme || (prefersDark ? "dark" : "light");
+    setIsDarkMode(theme === "dark");
   }, []);
-  
+
   useEffect(() => {
     if (file) {
       setIsUploading(true);
@@ -34,34 +32,36 @@ export default function SettingsForm({
       fetch("/api/upload", {
         method: "POST",
         body: data,
-      }).then(response => {
-        response.json().then(url => {
+      }).then((response) => {
+        response.json().then((url) => {
           setAvatarUrl(url);
           setIsUploading(false);
         });
       });
     }
   }, [file]);
-  
+
   const handleThemeToggle = (isDark: boolean) => {
     setIsDarkMode(isDark);
-    const theme = isDark ? 'dark' : 'light';
-    const html = document.querySelector('html');
+    const theme = isDark ? "dark" : "light";
+    const html = document.querySelector("html");
     if (html) {
       html.dataset.theme = theme;
-      html.classList.toggle('dark', isDark);
+      html.classList.toggle("dark", isDark);
     }
-    localStorage.setItem('theme', theme);
+    localStorage.setItem("theme", theme);
   };
-  
+
   return (
-    <form action={async (data: FormData) => {
-      await updateProfile(data);
-      router.push('/profile');
-      router.refresh();
-    }}>
-      <input type="hidden" name="avatar" value={avatarUrl || ''}/>
-      
+    <form
+      action={async (data: FormData) => {
+        await updateProfile(data);
+        router.push("/profile");
+        router.refresh();
+      }}
+    >
+      <input type="hidden" name="avatar" value={avatarUrl || ""} />
+
       <div className="space-y-6">
         {/* Avatar Section */}
         <div className="space-y-4">
@@ -70,9 +70,9 @@ export default function SettingsForm({
             <div className="relative">
               <div className="w-20 h-20 rounded-full overflow-hidden bg-muted border-2 border-border">
                 {avatarUrl ? (
-                  <img 
-                    className="w-full h-full object-cover" 
-                    src={avatarUrl} 
+                  <img
+                    className="w-full h-full object-cover"
+                    src={avatarUrl}
                     alt="Profile"
                   />
                 ) : (
@@ -88,12 +88,12 @@ export default function SettingsForm({
               )}
             </div>
             <div>
-              <input 
+              <input
                 type="file"
                 ref={fileInRef}
                 className="hidden"
                 accept="image/*"
-                onChange={ev => setFile(ev.target.files?.[0] || null)}
+                onChange={(ev) => setFile(ev.target.files?.[0] || null)}
               />
               <Button
                 type="button"
@@ -103,7 +103,7 @@ export default function SettingsForm({
                 className="btn btn-secondary"
               >
                 <CameraIcon className="w-4 h-4 mr-2" />
-                {isUploading ? 'Uploading...' : 'Change Photo'}
+                {isUploading ? "Uploading..." : "Change Photo"}
               </Button>
             </div>
           </div>
@@ -115,37 +115,37 @@ export default function SettingsForm({
             <label className="block text-sm font-medium mb-2">Username</label>
             <TextField.Root
               name="username"
-              defaultValue={profile?.username || ''}
+              defaultValue={profile?.username || ""}
               placeholder="your_username"
               className="w-full"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-2">Full Name</label>
             <TextField.Root
               name="name"
-              defaultValue={profile?.name || ''}
+              defaultValue={profile?.name || ""}
               placeholder="John Doe"
               className="w-full"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-2">Subtitle</label>
             <TextField.Root
               name="subtitle"
-              defaultValue={profile?.subtitle || ''}
+              defaultValue={profile?.subtitle || ""}
               placeholder="Graphic designer"
               className="w-full"
             />
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium mb-2">Bio</label>
-            <TextArea 
-              name="bio" 
-              defaultValue={profile?.bio || ''}
+            <TextArea
+              name="bio"
+              defaultValue={profile?.bio || ""}
               placeholder="Tell us about yourself..."
               className="min-h-24 resize-none"
             />
@@ -156,19 +156,18 @@ export default function SettingsForm({
         <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
           <div>
             <label className="text-sm font-medium">Dark Mode</label>
-            <p className="text-xs text-muted-foreground">Switch between light and dark themes</p>
+            <p className="text-xs text-muted-foreground">
+              Switch between light and dark themes
+            </p>
           </div>
-          <Switch
-            checked={isDarkMode}
-            onCheckedChange={handleThemeToggle}
-          />
+          <Switch checked={isDarkMode} onCheckedChange={handleThemeToggle} />
         </div>
       </div>
 
       {/* Submit Button */}
       <div className="flex justify-center pt-6">
-        <Button 
-          type="submit" 
+        <Button
+          type="submit"
           variant="solid"
           className="btn btn-primary px-8 py-3"
         >

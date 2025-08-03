@@ -1,47 +1,48 @@
 import FollowButton from "@/components/FollowButton";
-import {Follower, Profile} from "@prisma/client";
-import {CheckIcon, ChevronLeft, CogIcon, ArrowLeftIcon} from "lucide-react";
+import ProfileBackButton from "@/components/ProfileBackButton";
+import { Follower, Profile } from "@prisma/client";
+import { CheckIcon, CogIcon } from "lucide-react";
 import Link from "next/link";
-import {prisma} from "@/db";
+import { prisma } from "@/db";
 
 export default async function ProfilePageInfo({
   profile,
   isOurProfile,
   ourFollow,
-}:{
-  profile:Profile;
-  isOurProfile:boolean;
-  ourFollow:Follower|null;
+}: {
+  profile: Profile;
+  isOurProfile: boolean;
+  ourFollow: Follower | null;
 }) {
   // Get actual counts
   const followersCount = await prisma.follower.count({
-    where: { followedProfileId: profile.id }
+    where: { followedProfileId: profile.id },
   });
-  
+
   const followingCount = await prisma.follower.count({
-    where: { followingProfileEmail: profile.email }
+    where: { followingProfileEmail: profile.email },
   });
-  
+
   const postsCount = await prisma.post.count({
-    where: { author: profile.email }
+    where: { author: profile.email },
   });
-  
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <section className="flex items-center justify-between">
-        <button className="p-2 hover:bg-accent rounded-full transition-colors hover-lift-sm">
-          <ArrowLeftIcon className="w-5 h-5" />
-        </button>
+        <ProfileBackButton />
         <div className="flex items-center space-x-2">
-          <h1 className="text-lg font-semibold">{profile.username}</h1>
+          <h1 className="ig-heading text-lg font-semibold">
+            {profile.username}
+          </h1>
           <div className="w-5 h-5 ig-gradient rounded-full flex items-center justify-center">
             <CheckIcon className="w-3 h-3 text-white" />
           </div>
         </div>
         <div>
           {isOurProfile && (
-            <Link href='/settings' className="p-2 hover:bg-accent rounded-full transition-colors hover-lift-sm">
+            <Link href="/settings" className="p-2 rounded-full">
               <CogIcon className="w-5 h-5" />
             </Link>
           )}
@@ -52,13 +53,13 @@ export default async function ProfilePageInfo({
       <section className="flex flex-col md:flex-row md:items-center md:space-x-8">
         {/* Avatar */}
         <div className="flex justify-center md:justify-start mb-6 md:mb-0">
-          <div className="relative hover-lift">
+          <div className="relative">
             <div className="w-24 h-24 md:w-32 md:h-32 p-1 ig-gradient rounded-full">
               <div className="w-full h-full bg-background rounded-full p-1">
                 <div className="w-full h-full aspect-square overflow-hidden rounded-full">
                   <img
                     className="w-full h-full object-cover"
-                    src={profile.avatar || ''}
+                    src={profile.avatar || ""}
                     alt={profile.name || "Profile"}
                   />
                 </div>
@@ -74,10 +75,11 @@ export default async function ProfilePageInfo({
             {!isOurProfile && (
               <FollowButton
                 ourFollow={ourFollow}
-                profileIdToFollow={profile.id} />
+                profileIdToFollow={profile.id}
+              />
             )}
           </div>
-          
+
           <div className="flex space-x-8 text-sm">
             <div className="text-center">
               <div className="font-semibold">{postsCount}</div>
