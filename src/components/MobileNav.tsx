@@ -3,39 +3,52 @@ import Link from "next/link";
 
 export default function MobileNav() {
   return (
-    <div className="block md:hidden fixed bottom-0 left-0 right-0">
-      <div className="flex text-gray-700 dark:text-gray-300 *:flex *:items-center">
-        <div
-          className="pl-2 bg-white dark:bg-gray-700 rounded-t-xl w-full relative z-10 *:size-12 *:flex *:items-center *:justify-center justify-around">
-          <Link href="/" className="">
-            <HomeIcon/>
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
+      <div className="bg-card/80 backdrop-blur-md border-t border-border">
+        <div className="flex items-center justify-around px-4 py-2">
+          <Link 
+            href="/" 
+            className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-200 hover-lift-sm"
+          >
+            <HomeIcon className="w-6 h-6" />
+            <span className="text-xs font-medium">Home</span>
           </Link>
-          <Link href="/search" className="">
-            <SearchIcon/>
+          
+          <Link 
+            href="/search" 
+            className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-200 hover-lift-sm"
+          >
+            <SearchIcon className="w-6 h-6" />
+            <span className="text-xs font-medium">Search</span>
           </Link>
-        </div>
-        <div className="size-14 relative -top-4 justify-center w-[140px]">
-          <div
-            className="absolute bg-blue-500 bg-clip-text border-white dark:border-gray-700 border-t-transparent dark:border-t-transparent border-l-transparent dark:border-l-transparent border-[50px]  rounded-full rotate-45">
-            <div className="border-4 size-15 border-transparent">
-              <Link
-                href="/create"
-                className="-rotate-45 bg-gradient-to-tr from-ig-orange to-ig-red to-70% size-12 flex items-center justify-center text-white rounded-full">
-                <CameraIcon/>
-              </Link>
-            </div>
+          
+          {/* Create Button - Centered with special styling */}
+          <div className="relative -top-6">
+            <Link 
+              href="/create" 
+              className="flex items-center justify-center w-14 h-14 ig-gradient rounded-full shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 hover-lift"
+            >
+              <CameraIcon className="w-6 h-6 text-white" />
+            </Link>
           </div>
-        </div>
-        <div
-          className="pr-2 w-full bg-white dark:bg-gray-700 rounded-t-xl relative z-10 *:size-12 *:flex *:items-center *:justify-center justify-around">
-          <Link href="/browse" className="text-ig-red dark:text-ig-orange">
-            <LayoutGridIcon/>
+          
+          <Link 
+            href="/browse" 
+            className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-200 hover-lift-sm"
+          >
+            <LayoutGridIcon className="w-6 h-6" />
+            <span className="text-xs font-medium">Explore</span>
           </Link>
-          <Link href="/profile" className=" ">
-            <UserIcon/>
+          
+          <Link 
+            href="/profile" 
+            className="flex flex-col items-center space-y-1 p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors duration-200 hover-lift-sm"
+          >
+            <UserIcon className="w-6 h-6" />
+            <span className="text-xs font-medium">Profile</span>
           </Link>
         </div>
       </div>
-    </div>
+    </nav>
   );
 }

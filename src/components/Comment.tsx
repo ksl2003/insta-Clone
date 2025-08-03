@@ -12,30 +12,26 @@ export default function Comment ({
   authorProfile?: Profile;
 }) {
   return (
-    <div className="flex gap-2">
-      <div>
-        <Avatar src={authorProfile?.avatar || ''}/>
+    <div className="flex space-x-3">
+      <div className="flex-shrink-0">
+        <Avatar src={authorProfile?.avatar || ''} fallback={authorProfile?.name?.charAt(0) || 'U'}/>
       </div>
-      <div className="w-full">
-        <div className="flex justify-between gap-2">
-          <div>
-            <h3 className="flex gap-1 dark:text-gray-300">
-              {authorProfile?.name}
-            </h3>
-            <h4 className="text-gray-600 dark:text-gray-500 text-sm -mt-1">
-              @{authorProfile?.username}
-            </h4>
-          </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center space-x-2 mb-1">
+          <h3 className="font-medium text-foreground">
+            {authorProfile?.name}
+          </h3>
+          <span className="text-xs text-muted-foreground">
+            @{authorProfile?.username}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {format(createdAt, 'MMM d')}
+          </span>
         </div>
-        <div>
-          <div className="bg-gray-200 dark:bg-gray-700 border dark:border-0 dark:text-gray-400 border-gray-300 rounded-md p-4 mt-2">
-            <p>
-              {text}
-            </p>
-          </div>
-          <div className="text-xs text-gray-400 text-right">
-            {format(createdAt, 'yyyy-MM-dd HH:mm:ss')}
-          </div>
+        <div className="bg-muted/50 rounded-lg p-3">
+          <p className="text-sm leading-relaxed">
+            {text}
+          </p>
         </div>
       </div>
     </div>

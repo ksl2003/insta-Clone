@@ -4,6 +4,7 @@ import ProfileNav from "@/components/ProfileNav";
 import ProfilePageInfo from "@/components/ProfilePageInfo";
 import {prisma} from "@/db";
 import {redirect} from "next/navigation";
+import {BookmarkIcon} from "lucide-react";
 
 export default async function BookmarkedPage() {
   const session = await auth();
@@ -18,8 +19,9 @@ export default async function BookmarkedPage() {
   const posts = await prisma.post.findMany({
     where: {id: {in: bookmarks.map(b => b.postId)}},
   })
+  
   return (
-    <div>
+    <div className="space-y-6">
       <ProfilePageInfo
         profile={profile}
         isOurProfile={true}
@@ -27,7 +29,12 @@ export default async function BookmarkedPage() {
       <ProfileNav
         username={profile.username || ''}
         isOurProfile={true} />
-      <div className="mt-4">
+      
+      <div className="space-y-4">
+        <div className="flex items-center space-x-2">
+          <BookmarkIcon className="w-5 h-5 text-muted-foreground hover-lift" />
+          <h2 className="text-lg font-semibold font-serif">Saved Posts</h2>
+        </div>
         <PostsGrid posts={posts} />
       </div>
     </div>

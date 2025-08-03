@@ -12,33 +12,38 @@ export default async function HomeTopRow({
   profiles:Profile[],
 }) {
   return (
-    <div className="-mx-4 pl-4 md:pl-0">
-    <div className="flex gap-3 sm:justify-center w-full overflow-x-auto">
-      <div>
-        <button
-          className="size-[92px] bg-gradient-to-tr from-ig-orange to-ig-red text-white rounded-full flex items-center justify-center">
-          <PlusIcon size="42" />
-        </button>
-        <p className="text-center text-gray-400 text-sm">New Story</p>
-      </div>
-      {profiles.map(profile => (
-        <div className="w-24 flex flex-col justify-center items-center">
-          <div>
-            <div className="inline-block p-1 rounded-full bg-gradient-to-tr from-ig-orange to-ig-red">
-              <div className="inline-block p-0.5 bg-white dark:bg-black rounded-full">
-                <Avatar
-                  size="6"
-                  radius="full"
-                  fallback={'avatar'}
-                  src={profile.avatar || ''}
-                />
+    <div className="mb-8">
+      <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4">
+        {/* New Story Button */}
+        <div className="flex flex-col items-center space-y-2 min-w-[80px]">
+          <button className="w-16 h-16 ig-gradient rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105 hover-lift">
+            <PlusIcon className="w-6 h-6 text-white" />
+          </button>
+          <p className="text-xs text-muted-foreground font-medium">New Story</p>
+        </div>
+        
+        {/* User Stories */}
+        {profiles.map(profile => (
+          <div key={profile.id} className="flex flex-col items-center space-y-2 min-w-[80px]">
+            <div className="relative hover-lift">
+              <div className="w-16 h-16 p-0.5 ig-gradient rounded-full">
+                <div className="w-full h-full bg-background rounded-full p-0.5">
+                  <Avatar
+                    size="6"
+                    radius="full"
+                    fallback={profile.name?.charAt(0) || 'U'}
+                    src={profile.avatar || ''}
+                    className="w-full h-full"
+                  />
+                </div>
               </div>
             </div>
+            <p className="text-xs text-muted-foreground font-medium truncate w-full text-center">
+              {profile.username}
+            </p>
           </div>
-          <p className="text-center text-gray-400 text-sm">{profile.username}</p>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
     </div>
   );
 }

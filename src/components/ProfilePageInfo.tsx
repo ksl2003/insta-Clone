@@ -1,9 +1,10 @@
 import FollowButton from "@/components/FollowButton";
 import {Follower, Profile} from "@prisma/client";
-import {CheckIcon, ChevronLeft, CogIcon} from "lucide-react";
+import {CheckIcon, ChevronLeft, CogIcon, ArrowLeftIcon} from "lucide-react";
 import Link from "next/link";
+import {prisma} from "@/db";
 
-export default function ProfilePageInfo({
+export default async function ProfilePageInfo({
   profile,
   isOurProfile,
   ourFollow,
@@ -12,52 +13,98 @@ export default function ProfilePageInfo({
   isOurProfile:boolean;
   ourFollow:Follower|null;
 }) {
+  // Get actual counts
+  const followersCount = await prisma.follower.count({
+    where: { followedProfileId: profile.id }
+  });
+  
+  const followingCount = await prisma.follower.count({
+    where: { followingProfileEmail: profile.email }
+  });
+  
+  const postsCount = await prisma.post.count({
+    where: { author: profile.email }
+  });
+  
   return (
-    <div>
-      <section className="flex justify-between items-center">
-        <button>
-          <ChevronLeft/>
+    <div className="space-y-6">
+      {/* Header */}
+      <section className="flex items-center justify-between">
+        <button className="p-2 hover:bg-accent rounded-full transition-colors hover-lift-sm">
+          <ArrowLeftIcon className="w-5 h-5" />
         </button>
-        <div className="font-bold flex items-center gap-2">
-          {profile.username}
-          <div className="size-5 rounded-full bg-ig-red inline-flex justify-center items-center text-white">
-            <CheckIcon size={16}/>
+        <div className="flex items-center space-x-2">
+          <h1 className="text-lg font-semibold">{profile.username}</h1>
+          <div className="w-5 h-5 ig-gradient rounded-full flex items-center justify-center">
+            <CheckIcon className="w-3 h-3 text-white" />
           </div>
         </div>
         <div>
           {isOurProfile && (
-            <Link href='/settings'>
-              <CogIcon/>
+            <Link href='/settings' className="p-2 hover:bg-accent rounded-full transition-colors hover-lift-sm">
+              <CogIcon className="w-5 h-5" />
             </Link>
           )}
         </div>
       </section>
-      <section className="mt-8 flex justify-center">
-        <div className="size-48 p-2 rounded-full bg-gradient-to-tr from-ig-orange to-ig-red">
-          <div className="size-44 p-2 bg-white dark:bg-black rounded-full">
-            <div className="size-40 aspect-square overflow-hidden rounded-full">
-              <img
-                className=""
-                src={profile.avatar || ''}
-                alt=""/>
+
+      {/* Profile Info */}
+      <section className="flex flex-col md:flex-row md:items-center md:space-x-8">
+        {/* Avatar */}
+        <div className="flex justify-center md:justify-start mb-6 md:mb-0">
+          <div className="relative hover-lift">
+            <div className="w-24 h-24 md:w-32 md:h-32 p-1 ig-gradient rounded-full">
+              <div className="w-full h-full bg-background rounded-full p-1">
+                <div className="w-full h-full aspect-square overflow-hidden rounded-full">
+                  <img
+                    className="w-full h-full object-cover"
+                    src={profile.avatar || ''}
+                    alt={profile.name || "Profile"}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Profile Details */}
+        <div className="flex-1 space-y-4">
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-6">
+            <h2 className="text-xl font-bold">{profile.name}</h2>
+            {!isOurProfile && (
+              <FollowButton
+                ourFollow={ourFollow}
+                profileIdToFollow={profile.id} />
+            )}
+          </div>
+          
+          <div className="flex space-x-8 text-sm">
+            <div className="text-center">
+              <div className="font-semibold">{postsCount}</div>
+              <div className="text-muted-foreground">posts</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold">{followersCount}</div>
+              <div className="text-muted-foreground">followers</div>
+            </div>
+            <div className="text-center">
+              <div className="font-semibold">{followingCount}</div>
+              <div className="text-muted-foreground">following</div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {profile.subtitle && (
+              <p className="font-semibold">{profile.subtitle}</p>
+            )}
+            {profile.bio && (
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {profile.bio}
+              </p>
+            )}
+          </div>
+        </div>
       </section>
-      <section className="text-center mt-4">
-        <h1 className="text-xl font-bold">{profile.name}</h1>
-        <p className="text-gray-500 mt-1 mb-1">{profile.subtitle}</p>
-        <p className="">
-          {profile.bio}
-        </p>
-      </section>
-      {!isOurProfile && (
-        <section className="flex justify-center my-3">
-          <FollowButton
-            ourFollow={ourFollow}
-            profileIdToFollow={profile.id} />
-        </section>
-      )}
     </div>
   );
 }

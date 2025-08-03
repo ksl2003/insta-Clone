@@ -16,28 +16,37 @@ export default function LikesInfo({
 }) {
   const router = useRouter();
   const [likedByMe, setLikedByMe] = useState(!!sessionLike);
+  
   return (
     <form
       action={async (data:FormData) => {
         setLikedByMe(prev => !prev);
         if (likedByMe) {
-          // remove like
           await removeLikeFromPost(data);
         } else {
-          // add like
           await likePost(data);
         }
         router.refresh();
       }}
-      className="flex items-center gap-2">
+      className="flex items-center space-x-2"
+    >
       <input type="hidden" name="postId" value={post.id}/>
       <button
         type="submit"
-        className="">
-        <HeartIcon className={likedByMe ? 'text-red-500 fill-red-500' : 'dark:text-white'}/>
+        className="p-1 hover:bg-accent rounded-full transition-colors hover-lift-sm"
+      >
+        <HeartIcon 
+          className={`w-6 h-6 transition-all duration-200 ${
+            likedByMe 
+              ? 'text-blue-500 fill-blue-500 scale-110' 
+              : 'text-foreground hover:text-blue-500'
+          }`}
+        />
       </button>
       {showText && (
-        <p>{post.likesCount} people like this</p>
+        <span className="text-sm text-muted-foreground">
+          {post.likesCount || 0} likes
+        </span>
       )}
     </form>
   );
