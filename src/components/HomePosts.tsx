@@ -5,7 +5,7 @@ import LikesInfo from "@/components/LikesInfo";
 import { prisma } from "@/db";
 import { Follower, Profile } from "@prisma/client";
 import { Avatar } from "@radix-ui/themes";
-import { BookmarkIcon, MoreHorizontalIcon } from "lucide-react";
+import { MoreHorizontalIcon } from "lucide-react";
 import Link from "next/link";
 
 export default async function HomePosts({
@@ -15,7 +15,8 @@ export default async function HomePosts({
   follows: Follower[];
   profiles: Profile[];
 }) {
-  const posts = await prisma.post.findMany({
+  // 1. Fetch base post data without the counts
+  const postsData = await prisma.post.findMany({
     where: {
       author: { in: profiles.map((p) => p.email) },
     },
@@ -23,7 +24,6 @@ export default async function HomePosts({
       createdAt: "desc",
     },
     take: 100,
-    // Use select to specify all fields and the count
     select: {
       id: true,
       author: true,
@@ -31,27 +31,64 @@ export default async function HomePosts({
       description: true,
       createdAt: true,
       updatedAt: true,
-      // Also select the counts for related models
-      _count: {
-        select: {
-          likes: true,
-          comments: true,
-        },
-      },
     },
   });
+
+  // If there are no posts, we can stop here.
+  if (postsData.length === 0) {
+    return (
+      <div className="max-w-lg mx-auto text-center py-10 text-muted-foreground">
+        No posts to display.
+      </div>
+    );
+  }
+
+  const postIds = postsData.map((p) => p.id);
+
+  // 2. Fetch like and comment counts efficiently using groupBy
+  const likeCounts = await prisma.like.groupBy({
+    by: ["postId"],
+    where: { postId: { in: postIds } },
+    _count: { _all: true },
+  });
+
+  const commentCounts = await prisma.comment.groupBy({
+    by: ["postId"],
+    where: { postId: { in: postIds } },
+    _count: { _all: true },
+  });
+
+  // 3. Create maps for quick lookups
+  const likeCountsMap = new Map(
+    likeCounts.map((item) => [item.postId, item._count._all])
+  );
+  const commentCountsMap = new Map(
+    commentCounts.map((item) => [item.postId, item._count._all])
+  );
+
+  // 4. Combine the data to match the structure your component expects
+  const posts = postsData.map((post) => ({
+    ...post,
+    _count: {
+      likes: likeCountsMap.get(post.id) || 0,
+      comments: commentCountsMap.get(post.id) || 0,
+    },
+  }));
+
+  // The rest of your data fetching remains the same
   const likes = await prisma.like.findMany({
     where: {
       author: await getSessionEmailOrThrow(),
-      postId: { in: posts.map((p) => p.id) },
+      postId: { in: postIds },
     },
   });
   const bookmarks = await prisma.bookmark.findMany({
     where: {
       author: await getSessionEmailOrThrow(),
-      postId: { in: posts.map((p) => p.id) },
+      postId: { in: postIds },
     },
   });
+
   return (
     <div className="max-w-lg mx-auto space-y-6">
       {posts.map((post) => {
@@ -167,9 +204,9 @@ export default async function HomePosts({
               )}
 
               {/* Comments Preview */}
-              <div className="text-sm text-muted-foreground">
+              <Link href={`/posts/${post.id}`} className="text-sm text-muted-foreground hover:text-foreground">
                 View all {post._count?.comments || 0} comments
-              </div>
+              </Link>
 
               {/* Timestamp */}
               <div className="text-xs text-muted-foreground">
