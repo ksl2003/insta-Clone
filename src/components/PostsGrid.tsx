@@ -1,9 +1,9 @@
-'use client';
-import {Post} from "@prisma/client";
+"use client";
+import { Post } from "@prisma/client";
 import Link from "next/link";
-import Masonry from 'react-masonry-css';
+import Masonry from "react-masonry-css";
 
-export default function PostsGrid({posts}:{posts:Post[]}) {
+export default function PostsGrid({ posts }: { posts: Post[] }) {
   return (
     <div className="w-full">
       <Masonry
@@ -11,20 +11,21 @@ export default function PostsGrid({posts}:{posts:Post[]}) {
           default: 3,
           1024: 3,
           768: 2,
-          640: 1
+          640: 1,
         }}
         className="flex -ml-2"
-        columnClassName="pl-2">
-        {posts.map(post => (
+        columnClassName="pl-2"
+      >
+        {posts.map((post) => (
           <Link
             key={post.id}
-            href={`/posts/${post.id}`} 
+            href={`/posts/${post.id}`}
             className="block mb-2 group hover-lift"
           >
-            <div className="relative aspect-square overflow-hidden rounded-lg bg-muted image-hover">
+            <div className="relative w-full overflow-hidden rounded-lg bg-muted image-hover">
               <img
-                className="w-full h-full object-cover transition-transform duration-300"
-                src={post.image} 
+                className="w-full object-contain max-h-96 transition-transform duration-300 mx-auto"
+                src={post.image}
                 alt={post.description || "Post image"}
                 loading="lazy"
               />
