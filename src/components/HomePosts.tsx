@@ -5,7 +5,6 @@ import LikesInfo from "@/components/LikesInfo";
 import { prisma } from "@/db";
 import { Follower, Profile } from "@prisma/client";
 import { Avatar } from "@radix-ui/themes";
-import { MoreHorizontalIcon } from "lucide-react";
 import Link from "next/link";
 
 export default async function HomePosts({
@@ -69,6 +68,7 @@ export default async function HomePosts({
   // 4. Combine the data to match the structure your component expects
   const posts = postsData.map((post) => ({
     ...post,
+    likesCount: likeCountsMap.get(post.id) || 0,
     _count: {
       likes: likeCountsMap.get(post.id) || 0,
       comments: commentCountsMap.get(post.id) || 0,
@@ -116,9 +116,6 @@ export default async function HomePosts({
                   </p>
                 </div>
               </div>
-              <button className="p-1 hover:bg-accent rounded-full transition-colors hover-lift-sm">
-                <MoreHorizontalIcon className="w-5 h-5" />
-              </button>
             </div>
 
             {/* Post Image */}
@@ -204,7 +201,10 @@ export default async function HomePosts({
               )}
 
               {/* Comments Preview */}
-              <Link href={`/posts/${post.id}`} className="text-sm text-muted-foreground hover:text-foreground">
+              <Link
+                href={`/posts/${post.id}`}
+                className="text-sm text-muted-foreground hover:text-foreground"
+              >
                 View all {post._count?.comments || 0} comments
               </Link>
 
