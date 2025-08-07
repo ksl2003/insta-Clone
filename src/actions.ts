@@ -140,6 +140,7 @@ export async function getSinglePostData(postId: string) {
       myLike,
       myBookmark,
     };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     return null;
   }
