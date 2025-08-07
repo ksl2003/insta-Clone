@@ -93,39 +93,56 @@ export async function removeLikeFromPost(data: FormData) {
 }
 
 export async function getSinglePostData(postId: string) {
-  const post = await prisma.post.findFirstOrThrow({ where: { id: postId } });
-  const authorProfile = await prisma.profile.findFirstOrThrow({
-    where: { email: post.author },
-  });
-  const comments = await prisma.comment.findMany({
-    where: { postId: post.id },
-  });
-  const commentsAuthors = await prisma.profile.findMany({
-    where: {
-      email: { in: uniq(comments.map((c) => c.author)) },
-    },
-  });
-  const sessionEmail = await getSessionEmailOrThrow();
-  const myLike = await prisma.like.findFirst({
-    where: {
-      author: sessionEmail,
-      postId: post.id,
-    },
-  });
-  const myBookmark = await prisma.bookmark.findFirst({
-    where: {
-      author: sessionEmail,
-      postId: post.id,
-    },
-  });
-  return {
-    post,
-    authorProfile,
-    comments,
-    commentsAuthors,
-    myLike,
-    myBookmark,
-  };
+  try {
+    const post = await prisma.post.findFirst({ where: { id: postId } });
+    if (!post) return null;
+    const authorProfile = await prisma.profile.findFirst({
+      where: { email: post.author },
+    });
+    if (!authorProfile) return null;
+    const comments = await prisma.comment.findMany({
+      where: { postId: post.id },
+    });
+    const commentsAuthors = comments.length
+      ? await prisma.profile.findMany({
+          where: {
+            email: { in: uniq(comments.map((c) => c.author)) },
+          },
+        })
+      : [];
+    let sessionEmail = null;
+    try {
+      sessionEmail = await getSessionEmailOrThrow();
+    } catch {
+      sessionEmail = null;
+    }
+    const myLike = sessionEmail
+      ? await prisma.like.findFirst({
+          where: {
+            author: sessionEmail,
+            postId: post.id,
+          },
+        })
+      : null;
+    const myBookmark = sessionEmail
+      ? await prisma.bookmark.findFirst({
+          where: {
+            author: sessionEmail,
+            postId: post.id,
+          },
+        })
+      : null;
+    return {
+      post,
+      authorProfile,
+      comments,
+      commentsAuthors,
+      myLike,
+      myBookmark,
+    };
+  } catch (e) {
+    return null;
+  }
 }
 
 export async function followProfile(profileIdToFollow: string) {
